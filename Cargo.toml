@@ -1,7 +1,7 @@
 [package]
-name = "neuron"
+name = "GraphNeuron"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies]
-markdown = "0.3.0"
+[workspace]
+members = ["formated"]
