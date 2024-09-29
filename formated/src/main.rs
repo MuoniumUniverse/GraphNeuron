@@ -4,12 +4,11 @@ use comrak::{
 };
 use std::env;
 use std::fs::File;
-use std::io::Read;
+use std::io::{Read, Write};
 
 fn main() -> std::io::Result<()> {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
-        eprintln!("Please provide a filename as an argument.");
         std::process::exit(1);
     }
 
@@ -22,7 +21,7 @@ fn main() -> std::io::Result<()> {
     let root = parse_document(&arena, &contents, &comrak::ComrakOptions::default());
     let headers = get_headers(root);
 
-    let result = if headers.len() == 4
+    let format_result = if headers.len() == 4
         && headers[0] == "Question"
         && headers[1] == "Approach"
         && headers[2] == "Solution"
@@ -33,10 +32,15 @@ fn main() -> std::io::Result<()> {
         Err("Format Rejected ❌")
     };
 
-    match result {
+    match format_result {
         Ok(message) => println!("{}", message),
         Err(error) => println!("{}", error),
     }
+
+    // Check and update LaTeX-style brackets
+    let updated_contents = update_latex_brackets(&contents);
+    let mut file = File::create(filename)?;
+    file.write_all(updated_contents.as_bytes())?;
 
     Ok(())
 }
@@ -61,4 +65,12 @@ fn get_headers<'a>(node: &'a AstNode<'a>) -> Vec<String> {
             }
         })
         .collect()
+}
+
+fn update_latex_brackets(content: &str) -> String {
+    content
+        .replace("\\(", "\\\\(")
+        .replace("\\)", "\\\\)")
+        .replace("\\[", "\\\\[")
+        .replace("\\]", "\\\\]")
 }
