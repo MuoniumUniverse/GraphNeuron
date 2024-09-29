@@ -1,2 +1,2 @@
 # GraphNeuron
-Build a Knowledge Graph
+Building a Knowledge Graph
